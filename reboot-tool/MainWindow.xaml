@@ -5,8 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:reboot_tool"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Important Update For Your Device" Height="310.8" Width="416.6" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="423*"/>
+
+        </Grid.RowDefinitions>
+        <Label Name="timerLabel" Content=" " HorizontalAlignment="Right" Margin="0,228,230,0" VerticalAlignment="Top" Width="142" FontSize="24" FontWeight="Bold"/>
+        <Button Name="deferBtn" Content="Defer" HorizontalAlignment="Left" Margin="317,244,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click" IsEnabled="True"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,148,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="36" Width="348"><Run Text="By clicking the Defer button you can defer the restart by 1 hour at a time."/><Run Text=" "/><Run Text="You may defer the "/><Run Text="restart "/><Run Text="up to two hours."/></TextBlock>
+        <Button Content="Install and Restart Now" HorizontalAlignment="Left" Margin="175,244,0,0" VerticalAlignment="Top" Width="131" Click="Button_Click_1"/>
+        <Image HorizontalAlignment="Left" Height="86" Margin="10,10,0,0" VerticalAlignment="Top" Width="348" Source="Resources/logo.png" />
+        <TextBlock HorizontalAlignment="Left" Margin="10,101,0,0" TextWrapping="Wrap" Text="Your device has been scheduled to reboot for an important update from your IT department." VerticalAlignment="Top" Width="399"/>
+        <Label Content="Remaing time until reboot:" HorizontalAlignment="Left" Margin="10,206,0,0" VerticalAlignment="Top"/>
+
     </Grid>
 </Window>
