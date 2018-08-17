@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using System.Configuration;
 
 namespace reboot_tool
 {
@@ -30,6 +31,8 @@ namespace reboot_tool
         private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
         [DllImport("user32.dll")]
         private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -44,7 +47,7 @@ namespace reboot_tool
 
             DispatcherTimer dt = new DispatcherTimer();
             dt.Interval = TimeSpan.FromSeconds(1);
-            dt.Tick += dtTicker;
+            dt.Tick += DtTicker;
             dt.Start();
         }
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -55,9 +58,54 @@ namespace reboot_tool
                 e.Cancel = false;
             }
         }
+        public class Values
+        {
 
-        private int deincrement = 305; //0.5 hours in seconds
-        private void dtTicker(object sender, EventArgs e)
+        }
+
+        //config variables import
+        public static string CommandVal()
+        {
+            string result = string.Empty;
+            result = ConfigurationManager.AppSettings["command"];
+            return result;
+
+        }
+        public static string SwitchesVal()
+        {
+            string result = string.Empty;
+            result = ConfigurationManager.AppSettings["switches"];
+            return result;
+
+        }
+        public static int InitialTimeVal()
+        {
+            int result = 0;
+            result = Convert.ToInt32(ConfigurationManager.AppSettings["initialTime"]);
+            return result;
+
+        }
+        public static int WarningTimeVal()
+        {
+            int result = 0;
+            result = Convert.ToInt32(ConfigurationManager.AppSettings["warningTime"]);
+            return result;
+
+        }
+        public static int DeferTimeVal()
+        {
+            int result = 0;
+            result = Convert.ToInt32(ConfigurationManager.AppSettings["deferTime"]);
+            return result;
+
+        }
+        //String commandVal = ConfigurationManager.AppSettings["command"];
+        //String switchesVal = ConfigurationManager.AppSettings["switches"];
+        //int initialTimeVal = Convert.ToInt32(ConfigurationManager.AppSettings["initialTime"]);
+        //int warningTimeVal = Convert.ToInt32(ConfigurationManager.AppSettings["warningTime"]);
+        //int deferTimeVal = Convert.ToInt32(ConfigurationManager.AppSettings["deferTime"]);
+        public int deincrement = InitialTimeVal(); //0.5 hours in seconds
+        private void DtTicker(object sender, EventArgs e)
         {
             deincrement--;
             //timerLabel.Content = deincrement.ToString()+" Minutes";
@@ -67,16 +115,31 @@ namespace reboot_tool
             TimeSpan time = TimeSpan.FromSeconds(dtimeVal);
             string str = time.ToString(@"hh\:mm\:ss");
             timerLabel.Content = str;
-            if (deincrement == 300) //5 minutes in seconds
+            if (deincrement == WarningTimeVal()) //5 minutes in seconds
             {
                 this.WindowState = WindowState.Normal;
                 Activate();
             }
             if (deincrement <= 0)
             {
-                string strCmdText = " ping google.com";
-                System.Diagnostics.Process.Start("CMD.exe", "/C ipconfig");
-                Close();
+                try
+                {
+                    System.Diagnostics.Process.Start(CommandVal(), SwitchesVal());
+                    Close();
+                }
+                catch (Exception appErr)
+                {
+                    MessageBoxResult result = MessageBox.Show("Configuration is pointed to an application that cannot be found. Please check the path within the 'command' key is correct, or check your file permissions." + "\n \n" + "End Users should raise a problem via MyIT." + "\n" +  "Specify the following Error Code: RESTOOL ERR-0001",
+                                          "Error",
+                                          MessageBoxButton.OK,
+                                          MessageBoxImage.Error);
+                    if (result == MessageBoxResult.OK)
+                    {
+                        Application.Current.Shutdown();
+                    }
+
+
+                }
 
             }
         }
@@ -90,7 +153,7 @@ namespace reboot_tool
                 deferBtn.IsEnabled = false;
             }
             delayVal++;
-            deincrement += 3600; //1 hour in seconds
+            deincrement += DeferTimeVal(); //1 hour in seconds
             this.WindowState = WindowState.Minimized;
         }
 
